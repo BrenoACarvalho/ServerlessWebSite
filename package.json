@@ -1,0 +1,17 @@
+{
+  "name": "node-express-static-web-server",
+  "version": "1.0.0",
+  "description": "Node Express Static Web Server",
+  "scripts": {
+    "lint": "next lint",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "Kevin Chisholm",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "next": "11.1.3-canary.49"
+  }
+}

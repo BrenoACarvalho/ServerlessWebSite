@@ -1,0 +1,52 @@
+# Criado por Breno Carvalho - https://BrenoCarvalho.cloud
+# Created by Breno Carvalho - https://BrenoCarvalho.cloud
+variables:
+# Variáveis AWS
+  S3_BUCKET_NAME: $S3_BUCKET_NAME
+  AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+stages:
+    - test
+    # - build
+    - deploy
+# Security Tests    
+sast:
+  stage: test
+include:
+- template: Security/SAST.gitlab-ci.yml
+# Build serverless
+# build-serverless:
+#     stage: build
+#     image: node:latest
+#     cache:
+#         key: "$CI_COMMIT_REF_NAME"
+#         policy: push
+#     artifacts:
+#         paths:
+#             - ./www
+#         expire_in: 1 days
+#     before_script:
+#         - npm install -g serverless@2.72.2 -y
+#         - npm install
+#     script:
+#         - npx serverless@2.72.2 -y
+#     after_script:
+#         - ls -lha
+# Deploy
+deploy-s3:
+  stage: deploy
+  image:
+    name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  script:
+    - aws configure set region ${AWS_DEFAULT_REGION}
+    - aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+    - aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+# Copy files to S3
+    - aws s3 rm s3://serverless-breno/ --recursive
+    - cd ./www
+    - aws s3 cp . s3://serverless-breno/ --recursive # --acl public-read # --exclude "*" --include "*.js"
+# Cache Invalidation
+    - aws cloudfront create-invalidation --distribution-id E3AEF98CV45TPT --paths "/*"
+  only:
+    - main

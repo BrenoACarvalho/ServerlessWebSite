@@ -1,0 +1,29 @@
+# Criado por Breno Carvalho - https://BrenoCarvalho.cloud
+# Created by Breno Carvalho - https://BrenoCarvalho.cloud
+WebSiteServerless:
+  component: "@sls-next/serverless-component"
+  inputs:
+    useServerlessTraceTarget: true
+    cloudfront:
+      distributionId: E3AEF98CV45TPT #optional
+      certificate:
+        cloudFrontDefaultCertificate: true # specify false and one of IAM/ACM certificates, or specify true and omit IAM/ACM inputs for default certificate
+        # acmCertificateArn: "arn:aws:acm:us-east-1:466998650027:certificate/1825056c-3334-4911-8ecb-7d6e3d79cb65"
+        # minimumProtocolVersion: "TLSv1.2_2021" # can be omitted, defaults to "TLSv1.2_2019"
+      # aliases: ["seudominio.com.br"]
+      paths: ["/*"] # which paths should be invalidated on deploy, default matches everything, empty array skips invalidation completely
+      waitBeforeInvalidate: true # by default true, it waits for the CloudFront distribution to have completed before invalidating, to avoid possibly caching old page
+      # tags: # Add any tags you want
+      #    project: serverless
+      #    tag2: val2
+    bucketName: serverless-breno
+    description: 'Serverless Web Site'
+  distribution:
+    component: '@serverless/aws-cloudfront'
+    inputs:
+      region: us-east-1
+      enabled: true # optional
+      comment: 'Serverless Web Site' # optional
+    origins:
+      - https://serverless-breno.s3.amazonaws.com
+    # originPath: /website
